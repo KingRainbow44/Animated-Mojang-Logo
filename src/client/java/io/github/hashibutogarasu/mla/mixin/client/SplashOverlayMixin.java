@@ -1,6 +1,5 @@
 package io.github.hashibutogarasu.mla.mixin.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.hashibutogarasu.mla.MojangLogoAnimationClient;
 import io.github.hashibutogarasu.mla.config.ModConfig;
 import io.github.hashibutogarasu.mla.sounds.ModSounds;
@@ -8,13 +7,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TriState;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,17 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Function;
 
-import static net.minecraft.client.render.RenderPhase.*;
-
 @Mixin(SplashOverlay.class)
 public abstract class SplashOverlayMixin {
-    @Unique
-    private static final Transparency LOGO_TRANSPARENCY = new Transparency(
-            "mojang_logo_transparency",
-            RenderSystem::enableBlend,
-            RenderSystem::disableBlend
-    );
-
     @Unique private static boolean firstLoad = true;
 
     @Shadow @Final private ResourceReload reload;
@@ -122,25 +108,8 @@ public abstract class SplashOverlayMixin {
                 this.getMojangFrame(this.animProgress) :
                 this.getSharewareFrame(this.animProgress);
 
-        var frame = RenderLayer.of(
-                "animated_mojang_logo",
-                VertexFormats.POSITION_TEXTURE_COLOR,
-                VertexFormat.DrawMode.QUADS,
-                786432,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .texture(new RenderPhase.Texture(
-                                frameIdentifier,
-                                TriState.DEFAULT, false
-                        ))
-                        .program(RenderPhase.POSITION_TEXTURE_COLOR_PROGRAM)
-                        .transparency(LOGO_TRANSPARENCY)
-                        .depthTest(ALWAYS_DEPTH_TEST)
-                        .writeMaskState(COLOR_MASK)
-                        .build(false)
-        );
-
         context.drawTexture(
-                identifier -> frame,
+                identifier -> RenderLayer.getGuiTextured(frameIdentifier),
                 frameIdentifier,
                 x, y,
                 u, v,
