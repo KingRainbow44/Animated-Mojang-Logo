@@ -5,7 +5,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 
-public class MojangLogoAnimationClient implements ClientModInitializer {
+public final class MojangLogoAnimationClient implements ClientModInitializer {
 	public static ModConfig config;
 
 	@Override

@@ -8,7 +8,7 @@ import net.minecraft.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MojangLogoAnimation implements ModInitializer {
+public final class MojangLogoAnimation implements ModInitializer {
 	public static String MOD_ID = "mla";
 	public static final Logger LOGGER = LoggerFactory.getLogger("mla");
 
