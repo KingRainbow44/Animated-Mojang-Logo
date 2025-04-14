@@ -6,7 +6,6 @@ import io.github.hashibutogarasu.mla.sounds.ModSounds;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.util.Identifier;
@@ -19,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Function;
 
 @Mixin(SplashOverlay.class)
 public abstract class SplashOverlayMixin {
@@ -75,19 +72,16 @@ public abstract class SplashOverlayMixin {
 
     @Redirect(method = "render", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V",
+            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIFFIIII)V",
             ordinal = 0
     ))
     private void drawTexture0(
-            DrawContext context,
-            Function<Identifier, RenderLayer> renderLayers,
-            Identifier sprite,
+            DrawContext context, Identifier texture,
             int x, int y,
-            float u, float v,
             int width, int height,
+            float u, float v,
             int regionWidth, int regionHeight,
-            int textureWidth, int textureHeight,
-            int color
+            int textureWidth, int textureHeight
     ) {
         var d = Math.min((double) context.getScaledWindowWidth() * 0.75, context.getScaledWindowHeight()) * 0.25;
         var e = d * 4.0;
@@ -104,16 +98,15 @@ public abstract class SplashOverlayMixin {
             }
         }
 
-        var frameIdentifier = mode == ModConfig.Mode.MOJANG_STUDIOS ?
+        var frame = mode == ModConfig.Mode.MOJANG_STUDIOS ?
                 this.getMojangFrame(this.animProgress) :
                 this.getSharewareFrame(this.animProgress);
 
         context.drawTexture(
-                identifier -> RenderLayer.getGuiTextured(frameIdentifier),
-                frameIdentifier,
+                frame,
                 x, y,
-                u, v,
                 r, (int) d,
+                u, v,
                 regionWidth, regionHeight + 60,
                 textureWidth, textureHeight
         );
@@ -121,10 +114,10 @@ public abstract class SplashOverlayMixin {
 
     @Redirect(method = "render", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V",
+            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIFFIIII)V",
             ordinal = 1
     ))
-    private void drawTexture1(DrawContext instance, Function<Identifier, RenderLayer> renderLayers, Identifier sprite, int x, int y, float u, float v, int width, int height, int regionWidth, int regionHeight, int textureWidth, int textureHeight, int color) {
+    private void drawTexture1(DrawContext instance, Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
         // Do nothing.
         // We drop this call.
     }
